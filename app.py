@@ -10,7 +10,10 @@ app = Flask(__name__, template_folder='templates')
 # --- Konfigurasi Model ---
 MODEL_PATH = 'model/model_vgg16.keras'
 IMAGE_SIZE = (224, 224)
-CLASS_NAMES = ['Healthy', 'Black Mould Rot', 'Anthracnose', 'Stem end Rot', 'Alternaria']
+
+CLASS_NAMES = ['Alternaria', 'Anthracnose', 'Black Mould Rot', 'Healthy', 'Stem And rot']
+# Threshold confidence minimal untuk deteksi "bukan buah mangga"
+CONFIDENCE_THRESHOLD = 0.9  # 70%
 
 model = None
 
@@ -84,9 +87,14 @@ def classify():
         # Prediksi
         preds = model.predict(processed_image)[0]
 
+
         best_idx = np.argmax(preds)
         best_label = CLASS_NAMES[best_idx]
         confidence = float(preds[best_idx])
+
+        # Jika confidence di bawah threshold, anggap bukan buah mangga
+        if confidence < CONFIDENCE_THRESHOLD:
+            best_label = "Bukan buah mangga"
 
         all_pred = [
             {"label": CLASS_NAMES[i], "p": float(p)}
