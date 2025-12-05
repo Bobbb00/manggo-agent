@@ -1,8 +1,8 @@
-Flask==3.1.2
-gunicorn==23.0.0
+Flask
+gunicorn==
 tensorflow-cpu==2.16.1
-numpy==1.26.4
-Pillow==10.3.0
-Werkzeug==3.1.2
-itsdangerous==2.1.2
-click==8.1.7
+numpy
+Pillow
+Werkzeug
+itsdangerous
+click
