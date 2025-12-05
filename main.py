@@ -111,5 +111,5 @@ def classify():
         return jsonify({"error": f"Kesalahan saat memproses gambar: {e}"}), 500
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
