@@ -92,9 +92,15 @@ def classify():
         best_label = CLASS_NAMES[best_idx]
         confidence = float(preds[best_idx])
 
+
         # Jika confidence di bawah threshold, anggap bukan buah mangga
         if confidence < CONFIDENCE_THRESHOLD:
             best_label = "Bukan buah mangga"
+            return jsonify({
+                "label": best_label,
+                "confidence": None,
+                "predictions": []
+            })
 
         all_pred = [
             {"label": CLASS_NAMES[i], "p": float(p)}
