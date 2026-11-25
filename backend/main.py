@@ -48,7 +48,7 @@ def load_and_initialize_model():
 
         # Warm-up model dengan dummy input
         dummy = np.zeros((1, IMAGE_SIZE[0], IMAGE_SIZE[1], 3), dtype=np.float32)
-        model.predict(dummy)
+        model(dummy, training=False)
         print("Warm-up model sukses.")
 
     except Exception as e:
@@ -64,7 +64,7 @@ def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize(IMAGE_SIZE)
 
-    img_array = np.array(img, dtype=np.float32) / 255.0
+    img_array = np.array(img, dtype=np.float32) / np.float32(255.0)
     return np.expand_dims(img_array, axis=0)
 
 
@@ -94,7 +94,7 @@ def classify():
         image_bytes = file.read()
         processed_image = preprocess_image(image_bytes)
 
-        preds = model.predict(processed_image)[0]
+        preds = model(processed_image, training=False).numpy()[0]
         best_idx = int(np.argmax(preds))
         best_label = CLASS_NAMES[best_idx]
         confidence = float(preds[best_idx])

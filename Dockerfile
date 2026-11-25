@@ -23,4 +23,4 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "gunicorn --chdir backend main:app --bind 0.0.0.0:${PORT:-8080} --timeout 200 --workers 1 --threads 1 --preload"]
+CMD ["sh", "-c", "gunicorn --chdir backend main:app --bind 0.0.0.0:${PORT:-8080} --timeout 200 --workers 1 --threads 4 --preload"]
