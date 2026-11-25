@@ -1,6 +1,6 @@
 Flask
 flask-cors
 gunicorn>=21.2.0
-tensorflow==2.12.0
+tensorflow==2.19.0
 numpy
 Pillow
