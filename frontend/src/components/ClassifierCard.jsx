@@ -3,6 +3,15 @@ import { Camera, Upload, RotateCcw, Sparkles, AlertTriangle, CheckCircle2, X } f
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
+function fileToDataUrl(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => resolve(null)
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function ClassifierCard({ onNewResult }) {
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -138,12 +147,23 @@ export default function ClassifierCard({ onNewResult }) {
         return
       }
 
+      const historyImageSrc = await fileToDataUrl(selectedFile)
+
       if (data.is_mango === false || data.label === 'Bukan buah mangga') {
-        setResult({
+        const notMangoResult = {
           isMango: false,
           label: data.label || 'Bukan buah mangga',
           confidence: null,
           predictions: [],
+        }
+        setResult(notMangoResult)
+        onNewResult({
+          id: `h_${Date.now()}`,
+          waktu: new Date().toLocaleString('id-ID'),
+          label: notMangoResult.label,
+          akurasi: '< 90%',
+          predictions: [],
+          imageSrc: historyImageSrc,
         })
         return
       }
@@ -164,7 +184,7 @@ export default function ClassifierCard({ onNewResult }) {
         label: parsedResult.label,
         akurasi: `${acc}%`,
         predictions: parsedResult.predictions,
-        imageSrc: previewUrl,
+        imageSrc: historyImageSrc,
       })
     } catch (err) {
       console.error('Classify error:', err)
