@@ -1,18 +1,21 @@
 import io
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import numpy as np
 from PIL import Image
 import tensorflow as tf
 
-app = Flask(__name__)
+# --- Path Konfigurasi ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model_vgg16.keras")
+FRONTEND_DIST = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend", "dist"))
+
+app = Flask(__name__, static_folder=None)
 CORS(app)
 
 # --- Konfigurasi Model ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "model", "model_vgg16.keras")
 IMAGE_SIZE = (224, 224)
 
 CLASS_NAMES = [
@@ -65,8 +68,8 @@ def preprocess_image(image_bytes):
     return np.expand_dims(img_array, axis=0)
 
 
-# --- Routes ---
-@app.route("/", methods=["GET"])
+# --- Routes API ---
+@app.route("/health", methods=["GET"])
 def health_check():
     return jsonify({
         "status": "ok",
@@ -119,6 +122,19 @@ def classify():
 
     except Exception as e:
         return jsonify({"error": f"Kesalahan saat memproses gambar: {e}"}), 500
+
+
+# --- Serve Frontend Build (Production / Monorepo Docker) ---
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_frontend(path):
+    if os.path.isdir(FRONTEND_DIST):
+        target_path = os.path.join(FRONTEND_DIST, path)
+        if path and os.path.isfile(target_path):
+            return send_from_directory(FRONTEND_DIST, path)
+        return send_from_directory(FRONTEND_DIST, "index.html")
+
+    return health_check()
 
 
 if __name__ == "__main__":
